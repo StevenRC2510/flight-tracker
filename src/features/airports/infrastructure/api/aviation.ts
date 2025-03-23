@@ -1,20 +1,31 @@
 import appFetch from "@/core/appFetch";
 
-import { Airport } from "@/features/airports/domain/airport";
+import environment from "@/config/environment";
+
 import { AirportRepository } from "@/features/airports/domain/airportRepository";
+import {
+  Airport,
+  AirportsResponse,
+  fetchAirportsParams,
+} from "@/features/airports/domain/airport";
 
 export class AviationAPI implements AirportRepository {
-  private baseUrl = process.env.NEXT_PUBLIC_AVIATION_STACK_API!;
+  private baseUrl = environment.appsUrl.aviationStack.api;
+  private accessKey = environment.appsUrl.aviationStack.accessKey;
+  private basePath = `${this.baseUrl}/v1/airports`;
 
-  async fetchAirports(page = 1, search = ""): Promise<Airport[]> {
+  async fetchAirports({
+    page = 1,
+    search = "",
+  }: fetchAirportsParams): Promise<AirportsResponse> {
     const params = {
-      access_key: process.env.NEXT_PUBLIC_AVSTACK_KEY!,
+      access_key: this.accessKey,
       limit: 10,
       offset: (page - 1) * 10,
       search,
     };
-
-    const response = await appFetch<Airport[]>(`${this.baseUrl}/airports`, {
+    console.log(this.basePath, "BASE PATH");
+    const response = await appFetch<AirportsResponse>(this.basePath, {
       params,
     });
 
@@ -22,8 +33,8 @@ export class AviationAPI implements AirportRepository {
   }
 
   async getAirportDetails(id: string): Promise<Airport> {
-    const params = { access_key: process.env.NEXT_PUBLIC_AVIATION_STACK_KEY! };
-    const response = await appFetch<Airport>(`${this.baseUrl}/airports/${id}`, {
+    const params = { access_key: this.accessKey };
+    const response = await appFetch<Airport>(`${this.basePath}/${id}`, {
       params,
     });
 

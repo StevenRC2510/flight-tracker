@@ -1,6 +1,6 @@
-import { Airport } from "./airport";
+import { Airport, AirportsResponse, fetchAirportsParams } from "./airport";
 
 export type AirportRepository = {
-  fetchAirports(page: number, search: string): Promise<Airport[]>;
+  fetchAirports(params: fetchAirportsParams): Promise<AirportsResponse>;
   getAirportDetails(id: string): Promise<Airport>;
 };

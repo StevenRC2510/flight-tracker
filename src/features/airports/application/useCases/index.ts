@@ -1,10 +1,11 @@
+import { fetchAirportsParams } from "@/features/airports/domain/airport";
 import { AirportRepository } from "@/features/airports/domain/airportRepository";
 
 export class ListAirports {
   constructor(private repo: AirportRepository) {}
 
-  execute(page: number, search: string) {
-    return this.repo.fetchAirports(page, search);
+  execute(params: fetchAirportsParams) {
+    return this.repo.fetchAirports(params);
   }
 }
 

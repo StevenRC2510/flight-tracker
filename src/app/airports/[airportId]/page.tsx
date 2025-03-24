@@ -12,15 +12,16 @@ export const revalidate = 3600; // ISR
 export default async function AirportDetailPage({
   params,
 }: AirportDetailPageProps) {
-  const repo = new AviationAPI();
-  const useCase = new ListAirports(repo);
-  const allAirports = await useCase.execute({ page: 1, search: "" });
+  // const repo = new AviationAPI();
+  // const useCase = new ListAirports(repo);
+  // const allAirports = await useCase.execute({ page: 1, search: "" });
+  // const airportId = await params?.airportId;
 
-  const airport = allAirports.data.find((a) => a.id === params.airportId);
+  // const airport = allAirports.data.find(({ id }) => id === airportId);
 
-  if (!airport) {
-    return <div className="text-white p-8">Aeropuerto no encontrado</div>;
-  }
+  // if (!airport) {
+  //   return <div className="text-white p-8">Aeropuerto no encontrado</div>;
+  // }
 
-  return <AirportDetailManage airport={airport} />;
+  return <AirportDetailManage />;
 }

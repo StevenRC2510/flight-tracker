@@ -1,38 +1,52 @@
-"use client";
+import Button from "@/components/button";
 
-import { motion } from "framer-motion";
+import { getPaginationRange } from "@/utils";
 
 import { PaginationProps } from "./types";
 
-export default function Pagination({ page, setPage }: PaginationProps) {
+export default function Pagination({
+  page,
+  setPage,
+  totalPages,
+}: PaginationProps) {
+  const paginationRange = getPaginationRange(page, totalPages, 2);
+
   return (
-    <motion.div className="flex justify-center mt-10 gap-4">
-      <button
+    <div className="flex justify-center mt-10 gap-2 flex-wrap">
+      <Button
         disabled={page === 1}
         onClick={() => setPage(page - 1)}
-        className="px-4 py-2 bg-blue-600 rounded disabled:opacity-50"
+        className="rounded-m"
+        // className="px-4 py-2 bg-blue-600 rounded disabled:opacity-50"
       >
         Anterior
-      </button>
+      </Button>
 
-      {[1, 2, 3].map((num) => (
-        <button
-          key={num}
-          onClick={() => setPage(num)}
-          className={`px-4 py-2 rounded ${
-            page === num ? "bg-blue-700" : "bg-blue-500"
-          }`}
-        >
-          {num}
-        </button>
-      ))}
+      {paginationRange.map((num, index) =>
+        num === "..." ? (
+          <span key={`dots-${index}`} className="px-3 py-2">
+            ...
+          </span>
+        ) : (
+          <Button
+            key={num}
+            onClick={() => setPage(Number(num))}
+            className={`px-4 py-2 ${
+              page === num ? "bg-blue-700" : "bg-blue-500"
+            }`}
+          >
+            {num}
+          </Button>
+        )
+      )}
 
-      <button
+      <Button
+        disabled={page === totalPages}
         onClick={() => setPage(page + 1)}
-        className="px-4 py-2 bg-blue-600 rounded"
+        // className="px-4 py-2 bg-blue-600 rounded disabled:opacity-50"
       >
         Siguiente
-      </button>
-    </motion.div>
+      </Button>
+    </div>
   );
 }

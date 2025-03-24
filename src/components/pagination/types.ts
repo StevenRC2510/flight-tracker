@@ -1,4 +1,8 @@
 export interface PaginationProps {
   page: number;
-  setPage: (page: number) => void;
+  setPage: (currentPage: number) => void;
+  totalPages: number;
+  // pageNumbers: number[];
+  // canGoPrevious: boolean;
+  // canGoNext: boolean;
 }

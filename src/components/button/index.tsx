@@ -5,6 +5,7 @@ import { ButtonProps } from "./types";
 export default function Button({
   variant = "primary",
   size = "md",
+  shape = "square",
   isLoading = false,
   icon,
   children,
@@ -12,7 +13,7 @@ export default function Button({
   ...rest
 }: ButtonProps) {
   const base =
-    "rounded-full font-medium flex items-center justify-center gap-2 cursor-pointer";
+    "font-medium flex items-center justify-center gap-2 cursor-pointer";
   const sizes = {
     sm: "px-4 py-2 text-sm",
     md: "px-6 py-3 text-base",
@@ -22,10 +23,14 @@ export default function Button({
     primary: "bg-blue-600 text-white hover:bg-blue-700",
     secondary: "bg-gray-200 text-gray-800 hover:bg-gray-300",
   };
+  const shapeVariant = {
+    rounded: "rounded-full",
+    square: "rounded-[10px]",
+  };
 
   return (
     <button
-      className={`${base} ${sizes[size]} ${variants[variant]} ${className} disabled:opacity-50`}
+      className={`${base} ${shapeVariant[shape]} ${sizes[size]} ${variants[variant]} ${className} disabled:opacity-50`}
       disabled={isLoading || rest.disabled}
       {...rest}
     >

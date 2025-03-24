@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 
@@ -37,14 +37,7 @@ export default function AirportList({
   const itemsPerPage = pagination.limit;
 
   const [searchTerm, setSearchTerm] = useState(searchInitial);
-  const [filteredAirports, setFilteredAirports] = useState(airportsData);
-  const [isFiltering, setIsFiltering] = useState(false);
   const [localPage, setLocalPage] = useState(1);
-  const { totalPages: filteredTotalPages } = usePagination({
-    totalItems: filteredAirports.length,
-    itemsPerPage,
-    currentPage: localPage,
-  });
 
   useEffect(() => {
     setInitialData({
@@ -55,33 +48,45 @@ export default function AirportList({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleSearch = async () => {
+  const filteredAirports = useMemo(() => {
+    if (!searchTerm.trim()) return [];
+    return filterAirportsByName(airports, searchTerm);
+  }, [searchTerm, airports]);
+
+  const isFiltering = searchTerm.trim().length > 0;
+
+  const { totalPages: filteredTotalPages } = usePagination({
+    totalItems: filteredAirports.length,
+    itemsPerPage,
+    currentPage: localPage,
+  });
+
+  const handleSearch = useCallback(async () => {
     if (!searchTerm.trim()) {
       await fetchAirports({ page: 1 });
-      setIsFiltering(false);
       setCurrentPage(1);
       setLocalPage(1);
       router.replace("/airports");
       return;
     }
 
-    const filtered = filterAirportsByName(airports, searchTerm);
-    setFilteredAirports(filtered);
-    setIsFiltering(true);
     setLocalPage(1);
 
     const params = new URLSearchParams(searchParams.toString());
     params.set("search", searchTerm);
     router.replace(`/airports?${params.toString()}`);
-  };
+  }, [searchTerm, fetchAirports, setCurrentPage, router, searchParams]);
 
-  const handlePageChange = (newPage: number) => {
-    if (isFiltering) {
-      setLocalPage(newPage);
-    } else {
-      fetchAirports({ page: newPage });
-    }
-  };
+  const handlePageChange = useCallback(
+    (newPage: number) => {
+      if (isFiltering) {
+        setLocalPage(newPage);
+      } else {
+        fetchAirports({ page: newPage });
+      }
+    },
+    [isFiltering, fetchAirports]
+  );
 
   const startIndex =
     (isFiltering ? localPage - 1 : currentPage - 1) * itemsPerPage;

@@ -17,7 +17,7 @@ export default function SearchBar({
 
   return (
     <div
-      className={`w-full max-w-xl flex ${
+      className={`w-full flex ${
         isVertical ? "flex-col gap-4  items-center" : "flex-row gap-2"
       } ${className}`}
     >

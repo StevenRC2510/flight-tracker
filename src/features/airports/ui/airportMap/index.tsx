@@ -6,8 +6,7 @@ import { AirportMapProps } from "./types";
 import "leaflet/dist/leaflet.css";
 
 export default function AirportMap({ latitude, longitude }: AirportMapProps) {
-  const position = [Number(latitude), Number(longitude)];
-  console.log(position, "position");
+  const position: [number, number] = [Number(latitude), Number(longitude)];
 
   const ICON = L.icon({
     iconUrl: "/assets/images/plane.png",

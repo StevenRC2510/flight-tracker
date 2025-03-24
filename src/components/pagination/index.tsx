@@ -30,7 +30,7 @@ export default function Pagination({
           <Button
             key={num}
             onClick={() => setPage(Number(num))}
-            className={`px-4 py-2 ${
+            className={`px-4 py-2 rounded ${
               page === num ? "bg-blue-700" : "bg-blue-500"
             }`}
           >

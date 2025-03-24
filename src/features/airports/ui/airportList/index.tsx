@@ -1,17 +1,18 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
-import { Search } from "lucide-react";
 
 import { useAirportStore } from "@/features/airports/state/airportStore";
-import { usePagination } from "@/hooks/usePagination";
 
-import Button from "@/components/button";
-import Pagination from "@/components/pagination";
-import GradientText from "@/components/gradientText";
 import AirportCard from "@/features/airports/ui/airportCard";
+import Pagination from "@/components/pagination";
 import AirportListSkeleton from "@/features/airports/ui/airportListSkeleton";
+import AirportListHeader from "@/features/airports/ui/airportList/components/airportListHeader";
+
+import { usePagination } from "@/hooks/usePagination";
+import { filterAirportsByName } from "@/features/airports/application/useCases/filterAirports";
 
 import { AirportListProps } from "./types";
 
@@ -19,84 +20,103 @@ export default function AirportList({
   initialAirports,
   searchInitial,
 }: AirportListProps) {
-  console.log(initialAirports, "INITIAL AIRPORTS");
-  const { airports, fetchAirports, loading } = useAirportStore();
-  const [search, setSearch] = useState(searchInitial);
-  const [page, setPage] = useState(1);
-  const dataMerged = airports.length ? airports : initialAirports.data;
+  const { data: airportsData, pagination } = initialAirports;
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
-  const limit = initialAirports.pagination.limit;
-  const totalItems = initialAirports.pagination.total;
+  const {
+    airports,
+    currentPage,
+    loading,
+    totalPages,
+    setInitialData,
+    fetchAirports,
+    setCurrentPage,
+  } = useAirportStore();
 
-  const { totalPages, pageNumbers, canGoPrevious, canGoNext } = usePagination({
-    totalItems,
-    itemsPerPage: limit,
-    currentPage: page,
+  const itemsPerPage = pagination.limit;
+
+  const [searchTerm, setSearchTerm] = useState(searchInitial);
+  const [filteredAirports, setFilteredAirports] = useState(airportsData);
+  const [isFiltering, setIsFiltering] = useState(false);
+  const [localPage, setLocalPage] = useState(1);
+  const { totalPages: filteredTotalPages } = usePagination({
+    totalItems: filteredAirports.length,
+    itemsPerPage,
+    currentPage: localPage,
   });
 
-  console.log(page, "PAGE");
+  useEffect(() => {
+    setInitialData({
+      airports: airportsData,
+      totalItems: pagination.total,
+      totalPages: Math.ceil(pagination.total / pagination.limit),
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const handleSearch = async () => {
-    // await fetchAirports(1, search);
-    setPage(1);
+    if (!searchTerm.trim()) {
+      await fetchAirports({ page: 1 });
+      setIsFiltering(false);
+      setCurrentPage(1);
+      setLocalPage(1);
+      router.replace("/airports");
+      return;
+    }
+
+    const filtered = filterAirportsByName(airports, searchTerm);
+    setFilteredAirports(filtered);
+    setIsFiltering(true);
+    setLocalPage(1);
+
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("search", searchTerm);
+    router.replace(`/airports?${params.toString()}`);
   };
 
-  useEffect(() => {
-    fetchAirports({ page, search });
-  }, [page]);
+  const handlePageChange = (newPage: number) => {
+    if (isFiltering) {
+      setLocalPage(newPage);
+    } else {
+      fetchAirports({ page: newPage });
+    }
+  };
 
-  if (!dataMerged.length) {
-    return <p>No hay datos en tu búsqueda</p>;
-  }
+  const startIndex =
+    (isFiltering ? localPage - 1 : currentPage - 1) * itemsPerPage;
+  const visibleAirports = isFiltering
+    ? filteredAirports.slice(startIndex, startIndex + itemsPerPage)
+    : airports;
 
   return (
     <div className="p-8 relative">
-      <motion.header
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-        className="grid grid-cols-2 items-center mb-8"
-      >
-        <GradientText className="text-5xl">SkyConnect Explorer</GradientText>
+      <AirportListHeader
+        searchTerm={searchTerm}
+        onSearch={setSearchTerm}
+        onHandleSearch={handleSearch}
+        isLoading={loading}
+      />
 
-        <div className="flex gap-4">
-          <input
-            type="text"
-            placeholder="Buscar aeropuertos..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="p-2 rounded-3xl flex-1 outline-none text-blue-700 bg-white"
-          />
-          <Button
-            onClick={handleSearch}
-            className="w-36 flex items-center gap-2 bg-gradient-to-r from-blue-500 to-cyan-400 hover:bg-blue-700 text-white px-6 py-2 rounded-xl shadow-md"
-          >
-            <Search className="w-4 h-4" />
-            Buscar
-          </Button>
-        </div>
-      </motion.header>
       {loading ? (
         <AirportListSkeleton count={6} />
       ) : (
         <motion.div
-          className="grid md:grid-cols-2 gap-6"
+          className="grid md:grid-cols-2 gap-6 mt-8"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3 }}
         >
-          {dataMerged.map((airport) => (
+          {visibleAirports.map((airport) => (
             <AirportCard key={airport.id} airport={airport} />
           ))}
         </motion.div>
       )}
 
       <Pagination
-        page={page}
-        setPage={setPage}
-        // pageNumbers={pageNumbers}
-        totalPages={totalPages}
-        // canGoNext={canGoNext}
-        // canGoPrevious={canGoPrevious}
+        page={isFiltering ? localPage : currentPage}
+        setPage={handlePageChange}
+        totalPages={isFiltering ? filteredTotalPages : totalPages}
       />
     </div>
   );

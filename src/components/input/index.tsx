@@ -16,9 +16,9 @@ export default function Input({
 
       <input
         {...rest}
-        className={`w-full rounded-full p-3 pl-${iconLeft ? "10" : "4"} pr-${
-          iconRight ? "10" : "4"
-        } text-gray-700 outline-none ${className}`}
+        className={`w-full bg-white rounded-full p-3 pl-${
+          iconLeft ? "10" : "4"
+        } pr-${iconRight ? "10" : "4"} text-blue-700 outline-none ${className}`}
       />
 
       {iconRight && (

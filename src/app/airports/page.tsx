@@ -12,8 +12,7 @@ export default async function AirportsPage({
   const search = (await searchParams.search) ?? "";
   const repo = new AviationAPI();
   const useCase = new ListAirports(repo);
-  const airports = await useCase.execute({ page: 1, search });
-  console.log(airports, "AIRPORTS");
+  const airports = await useCase.execute({ page: 1 });
 
   return <AirportList initialAirports={airports} searchInitial={search} />;
 }

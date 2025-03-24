@@ -1,21 +1,10 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-import {
-  Airport,
-  fetchAirportsParams,
-} from "@/features/airports/domain/airport";
+import { AirportState } from "@/features/airports/domain/state";
 import { AviationAPI } from "@/features/airports/infrastructure/api/aviation";
 
 import { ListAirports } from "@/features/airports/application/useCases";
-
-interface AirportState {
-  airports: Airport[];
-  selectedAirport: Airport | null;
-  loading: boolean;
-  fetchAirports: (params: fetchAirportsParams) => Promise<void>;
-  setSelectedAirport: (airport: Airport) => void;
-}
 
 export const useAirportStore = create<AirportState>()(
   persist(
@@ -23,14 +12,41 @@ export const useAirportStore = create<AirportState>()(
       airports: [],
       selectedAirport: null,
       loading: false,
-      fetchAirports: async (params) => {
+      currentPage: 1,
+      totalItems: 0,
+      totalPages: 0,
+
+      setInitialData: ({ airports, totalItems, totalPages }) =>
+        set({
+          airports,
+          totalItems,
+          totalPages,
+          currentPage: 1,
+        }),
+
+      fetchAirports: async ({ page }) => {
         set({ loading: true });
-        const airports = await new ListAirports(new AviationAPI()).execute(
-          params
+
+        const response = await new ListAirports(new AviationAPI()).execute({
+          page,
+        });
+
+        const totalPagesCalc = Math.ceil(
+          response.pagination.total / response.pagination.limit
         );
-        set({ airports: airports.data, loading: false });
+
+        set({
+          airports: response.data,
+          currentPage: page,
+          totalItems: response.pagination.total,
+          totalPages: totalPagesCalc,
+          loading: false,
+        });
       },
+
       setSelectedAirport: (airport) => set({ selectedAirport: airport }),
+
+      setCurrentPage: (page) => set({ currentPage: page }),
     }),
     { name: "airport-store" }
   )

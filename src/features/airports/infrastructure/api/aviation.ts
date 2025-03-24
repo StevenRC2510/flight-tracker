@@ -16,13 +16,11 @@ export class AviationAPI implements AirportRepository {
 
   async fetchAirports({
     page = 1,
-    search = "",
   }: fetchAirportsParams): Promise<AirportsResponse> {
     const params = {
       access_key: this.accessKey,
       limit: 10,
       offset: (page - 1) * 10,
-      search,
     };
     console.log(this.basePath, "BASE PATH");
     const response = await appFetch<AirportsResponse>(this.basePath, {

@@ -4,7 +4,6 @@ interface UsePaginationProps {
   totalItems: number;
   itemsPerPage: number;
   currentPage: number;
-  siblingCount?: number;
 }
 
 export function usePagination({
@@ -13,7 +12,7 @@ export function usePagination({
   currentPage,
 }: UsePaginationProps) {
   const totalPages = useMemo(() => {
-    return Math.ceil(totalItems / itemsPerPage);
+    return Math.ceil(totalItems / itemsPerPage) || 1;
   }, [totalItems, itemsPerPage]);
 
   const pageNumbers = useMemo(() => {

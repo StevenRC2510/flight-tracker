@@ -17,7 +17,6 @@ export default function Pagination({
         disabled={page === 1}
         onClick={() => setPage(page - 1)}
         className="rounded-m"
-        // className="px-4 py-2 bg-blue-600 rounded disabled:opacity-50"
       >
         Anterior
       </Button>
@@ -40,11 +39,7 @@ export default function Pagination({
         )
       )}
 
-      <Button
-        disabled={page === totalPages}
-        onClick={() => setPage(page + 1)}
-        // className="px-4 py-2 bg-blue-600 rounded disabled:opacity-50"
-      >
+      <Button disabled={page === totalPages} onClick={() => setPage(page + 1)}>
         Siguiente
       </Button>
     </div>

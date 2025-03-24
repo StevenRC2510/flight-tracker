@@ -20,5 +20,4 @@ export type AirportsResponse = PaginationApiResponse<Airport[]>;
 
 export type fetchAirportsParams = {
   page?: number;
-  search?: string;
 };

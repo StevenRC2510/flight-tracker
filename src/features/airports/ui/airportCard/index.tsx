@@ -1,6 +1,6 @@
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { PlaneIcon } from "lucide-react";
 
 import { useAirportStore } from "@/features/airports/state/airportStore";
 
@@ -12,7 +12,6 @@ export default function AirportCard({ airport }: AirportCardProps) {
     (state) => state.setSelectedAirport
   );
   const { airport_name, city_iata_code, country_name, iata_code } = airport;
-  // const airportCityName = airportsInfo[city_iata_code]?.city ?? "";
 
   const handleClick = () => {
     setSelectedAirport(airport);
@@ -39,9 +38,13 @@ export default function AirportCard({ airport }: AirportCardProps) {
 
       <div className="relative flex justify-end p-4 bg-cover bg-center bg-[url('/assets/images/card-background.jpeg')]">
         <div className="absolute inset-0 bg-gradient-to-b from-[#3F495F] via-[#1B253E] to-[#0E1934] opacity-95 z-0" />{" "}
-        <div className="relative w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center shadow-md z-10">
-          <PlaneIcon className="text-white w-6 h-6" />
-        </div>
+        <Image
+          className="absolute"
+          src="/assets/images/plane.png"
+          alt="plane-image"
+          width={55}
+          height={55}
+        />
       </div>
     </motion.div>
   );

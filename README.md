@@ -20,8 +20,8 @@ SkyConnect Explorer is a modern **Next.js 15** web app to explore airports world
 
 ## 🔐 Envs
 
-NEXT_PUBLIC_AVIATIONSTACK_API=https://api.aviationstack.com
-NEXT_PUBLIC_AVIATIONSTACK_ACCESS_KEY=your_api_key
+AVIATION_STACK_API=https://api.aviationstack.com
+AVIATION_STACK_KEY=your_api_key
 
 ## 🧪 Scripts
 npm run dev | Run development server
